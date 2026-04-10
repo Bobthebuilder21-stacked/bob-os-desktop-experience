@@ -1,16 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { useSystemStatus } from "@/hooks/useSystemStatus";
+import { LoginScreen } from "@/components/bobos/LoginScreen";
+import { Desktop } from "@/components/bobos/Desktop";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const { battery, formattedTime, formattedDate } = useSystemStatus();
+
+  const handleLogin = () => {
+    setTransitioning(true);
+    setTimeout(() => setLoggedIn(true), 600);
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="w-screen h-screen overflow-hidden">
+      {loggedIn ? (
+        <div style={{ animation: "fadeIn 0.6s ease-out" }}>
+          <Desktop battery={battery} formattedTime={formattedTime} formattedDate={formattedDate} />
+        </div>
+      ) : (
+        <div style={transitioning ? { animation: "fadeOut 0.5s ease-out forwards" } : undefined}>
+          <LoginScreen
+            battery={battery}
+            formattedTime={formattedTime}
+            formattedDate={formattedDate}
+            onLogin={handleLogin}
+          />
+        </div>
+      )}
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
