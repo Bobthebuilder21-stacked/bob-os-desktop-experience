@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Welcome to Bob os 
 
-TODO: Document your project here
+hello this is a project that look like linux but is not 
