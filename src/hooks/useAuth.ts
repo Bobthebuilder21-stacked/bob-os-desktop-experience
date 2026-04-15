@@ -25,26 +25,37 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, username: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username, display_name: username },
-        emailRedirectTo: window.location.origin,
-      },
-    });
-    return { error };
-  }, []);
+  const loginWithUsername = useCallback(async (username: string) => {
+    const email = `${username.toLowerCase().replace(/[^a-z0-9]/g, "")}@bobos.local`;
+    const password = `bobos-${username.toLowerCase()}-autogen`;
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error };
+    // Try sign in first
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    if (!signInError) return { error: null };
+
+    // If invalid credentials, try signing up
+    if (signInError.message.includes("Invalid login credentials")) {
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username, display_name: username },
+        },
+      });
+      if (signUpError) return { error: signUpError.message };
+
+      // Auto sign-in after signup
+      const { error: retryError } = await supabase.auth.signInWithPassword({ email, password });
+      if (retryError) return { error: retryError.message };
+      return { error: null };
+    }
+
+    return { error: signInError.message };
   }, []);
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut();
   }, []);
 
-  return { user, session, loading, signUp, signIn, signOut };
+  return { user, session, loading, loginWithUsername, signOut };
 }

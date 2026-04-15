@@ -6,7 +6,7 @@ import { AuthScreen } from "@/components/bobos/AuthScreen";
 import { Desktop } from "@/components/bobos/Desktop";
 
 const Index = () => {
-  const { user, loading, signIn, signUp, signOut } = useAuth();
+  const { user, loading, loginWithUsername, signOut } = useAuth();
   const { settings, updateSettings, loaded } = useUserSettings(user);
   const { battery, formattedTime, formattedDate } = useSystemStatus();
   const [transitioning, setTransitioning] = useState(false);
@@ -26,8 +26,7 @@ const Index = () => {
           battery={battery}
           formattedTime={formattedTime}
           formattedDate={formattedDate}
-          onSignIn={signIn}
-          onSignUp={signUp}
+          onLogin={loginWithUsername}
         />
       </div>
     );
