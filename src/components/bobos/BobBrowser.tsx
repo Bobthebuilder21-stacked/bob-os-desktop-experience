@@ -111,7 +111,7 @@ export function BobBrowser() {
 
   const engine = SEARCH_ENGINES.find((e) => e.id === engineId)!;
   const currentTab = tabs.find((t) => t.id === activeTab)!;
-  const isInternal = currentTab?.url.startsWith("bobos://");
+  
 
   const navigate = (url: string) => {
     if (url.startsWith("bobos://")) {
