@@ -111,26 +111,27 @@ export function BobBrowser() {
 
   const engine = SEARCH_ENGINES.find((e) => e.id === engineId)!;
   const currentTab = tabs.find((t) => t.id === activeTab)!;
-  const isInternal = currentTab?.url.startsWith("bobos://");
+  
 
   const navigate = (url: string) => {
-    let finalUrl = url;
-    let title = url;
-
     if (url.startsWith("bobos://")) {
-      title = INTERNAL_PAGES[url]?.title ?? url;
-    } else if (!isUrl(url)) {
-      finalUrl = engine.searchUrl(url);
-      title = `${engine.name}: ${url}`;
-    } else if (!url.startsWith("http")) {
-      finalUrl = `https://${url}`;
-      title = url;
+      const title = INTERNAL_PAGES[url]?.title ?? url;
+      setTabs((prev) =>
+        prev.map((t) => (t.id === activeTab ? { ...t, url, title } : t))
+      );
+      setAddressInput(url);
+    } else {
+      // External URL or search — open in a real browser tab
+      let finalUrl: string;
+      if (!isUrl(url)) {
+        finalUrl = engine.searchUrl(url);
+      } else if (!url.startsWith("http")) {
+        finalUrl = `https://${url}`;
+      } else {
+        finalUrl = url;
+      }
+      window.open(finalUrl, "_blank", "noopener,noreferrer");
     }
-
-    setTabs((prev) =>
-      prev.map((t) => (t.id === activeTab ? { ...t, url: finalUrl, title } : t))
-    );
-    setAddressInput(finalUrl);
   };
 
   const addTab = () => {
@@ -250,20 +251,11 @@ export function BobBrowser() {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content — only internal pages render here; external URLs open in a real tab */}
       <div className="flex-1 overflow-hidden">
-        {isInternal ? (
-          <div className="p-6 overflow-auto h-full">
-            {(INTERNAL_PAGES[currentTab.url]?.content ?? INTERNAL_PAGES["bobos://home"]!.content)(engine, () => setShowEngineMenu(true))}
-          </div>
-        ) : (
-          <iframe
-            src={currentTab.url}
-            className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="Bob Browser"
-          />
-        )}
+        <div className="p-6 overflow-auto h-full">
+          {(INTERNAL_PAGES[currentTab.url]?.content ?? INTERNAL_PAGES["bobos://home"]!.content)(engine, () => setShowEngineMenu(true))}
+        </div>
       </div>
     </div>
   );
