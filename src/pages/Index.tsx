@@ -26,8 +26,7 @@ const Index = () => {
           battery={battery}
           formattedTime={formattedTime}
           formattedDate={formattedDate}
-          onSignIn={signIn}
-          onSignUp={signUp}
+          onLogin={loginWithUsername}
         />
       </div>
     );
