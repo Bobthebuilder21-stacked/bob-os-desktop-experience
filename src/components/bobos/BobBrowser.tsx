@@ -251,20 +251,11 @@ export function BobBrowser() {
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content — only internal pages render here; external URLs open in a real tab */}
       <div className="flex-1 overflow-hidden">
-        {isInternal ? (
-          <div className="p-6 overflow-auto h-full">
-            {(INTERNAL_PAGES[currentTab.url]?.content ?? INTERNAL_PAGES["bobos://home"]!.content)(engine, () => setShowEngineMenu(true))}
-          </div>
-        ) : (
-          <iframe
-            src={currentTab.url}
-            className="w-full h-full border-0"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            title="Bob Browser"
-          />
-        )}
+        <div className="p-6 overflow-auto h-full">
+          {(INTERNAL_PAGES[currentTab.url]?.content ?? INTERNAL_PAGES["bobos://home"]!.content)(engine, () => setShowEngineMenu(true))}
+        </div>
       </div>
     </div>
   );
