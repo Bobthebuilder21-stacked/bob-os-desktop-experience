@@ -114,23 +114,24 @@ export function BobBrowser() {
   const isInternal = currentTab?.url.startsWith("bobos://");
 
   const navigate = (url: string) => {
-    let finalUrl = url;
-    let title = url;
-
     if (url.startsWith("bobos://")) {
-      title = INTERNAL_PAGES[url]?.title ?? url;
-    } else if (!isUrl(url)) {
-      finalUrl = engine.searchUrl(url);
-      title = `${engine.name}: ${url}`;
-    } else if (!url.startsWith("http")) {
-      finalUrl = `https://${url}`;
-      title = url;
+      const title = INTERNAL_PAGES[url]?.title ?? url;
+      setTabs((prev) =>
+        prev.map((t) => (t.id === activeTab ? { ...t, url, title } : t))
+      );
+      setAddressInput(url);
+    } else {
+      // External URL or search — open in a real browser tab
+      let finalUrl: string;
+      if (!isUrl(url)) {
+        finalUrl = engine.searchUrl(url);
+      } else if (!url.startsWith("http")) {
+        finalUrl = `https://${url}`;
+      } else {
+        finalUrl = url;
+      }
+      window.open(finalUrl, "_blank", "noopener,noreferrer");
     }
-
-    setTabs((prev) =>
-      prev.map((t) => (t.id === activeTab ? { ...t, url: finalUrl, title } : t))
-    );
-    setAddressInput(finalUrl);
   };
 
   const addTab = () => {
